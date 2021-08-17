@@ -1,12 +1,33 @@
 {
-  "name": "EatTheBlock",
+  "name": "celo-trust-dapp",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abbracx/celo-trust-dapp.git"
+  },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Abbracx/celo-trust-dapp/issues"
+  },
+  "homepage": "https://github.com/Abbracx/celo-trust-dapp#readme",
+  "dependencies": {
+    "@celo/contractkit": "^1.2.4",
+    "bignumber": "^1.1.0"
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "^5.3.2",
+    "webpack": "^5.45.1",
+    "webpack-cli": "^4.7.2",
+    "webpack-dev-server": "^3.11.2"
+  }
 }
