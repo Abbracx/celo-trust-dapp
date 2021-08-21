@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 interface IERC20Token {
   function transfer(address, uint256) external returns (bool);
@@ -102,7 +102,7 @@ contract Trust{
         require (Kids[KidsIndex[_name]].paid == false, "Paid Already.");
         require (Kids[KidsIndex[_name]].timeToMaturity < block.timestamp, "Sorry You cannot withdraw now.");
 
-        IERC20Token(cUsdTokenAddress).transferFrom(address(this), payable(_child), Kids[KidsIndex[_name]].amount);
+        IERC20Token(cUsdTokenAddress).transfer(payable(_child), Kids[KidsIndex[_name]].amount);
         Kids[KidsIndex[_name]].paid = true;
     }
 
