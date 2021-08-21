@@ -17,7 +17,7 @@ contract Trust{
 
     address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
     address internal admin; // Owner of the contract
-    uint internal childCount;
+    uint internal childCount = 0;
 
     //an enumeration to make sure kid is not added twice
     enum Status {NOT_ADDED, IS_ADDED}
@@ -46,7 +46,6 @@ contract Trust{
 
 
   constructor() {
-    childCount = 0;
     admin = msg.sender;
   }
 
@@ -62,7 +61,6 @@ contract Trust{
         require (Kids[childCount].status == Status.NOT_ADDED, "Kid already exist");
         require ( _kid != msg.sender, "Dude You cant add yourself.");
 
-        IERC20Token(cUsdTokenAddress).approve(address(this), _amount);
         IERC20Token(cUsdTokenAddress).transferFrom(msg.sender, address(this), _amount);
 
         Kids[childCount] = Kid(payable(_kid), _name, _amount, timeToMaturity, _paid, Status.IS_ADDED);
@@ -80,16 +78,14 @@ contract Trust{
         uint timeToMaturity,
         bool paid ){
 
-        if(keccak256(bytes(_name)) == keccak256(bytes(Kids[KidsIndex[_name]].name))){
-            return (
-                Kids[KidsIndex[_name]].child,
-                Kids[KidsIndex[_name]].name,
-                Kids[KidsIndex[_name]].amount,
-                Kids[KidsIndex[_name]].timeToMaturity,
-                Kids[KidsIndex[_name]].paid
-                );
-        }
-
+        require (keccak256(bytes(_name)) == keccak256(bytes(Kids[KidsIndex[_name]].name)));
+        return (
+            Kids[KidsIndex[_name]].child,
+            Kids[KidsIndex[_name]].name,
+            Kids[KidsIndex[_name]].amount,
+            Kids[KidsIndex[_name]].timeToMaturity,
+            Kids[KidsIndex[_name]].paid
+            );
     }
 
     function withdrawAmount(string memory _name) external {

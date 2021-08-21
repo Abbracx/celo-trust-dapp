@@ -8,7 +8,6 @@ module.exports = async function(deployer, network, address){
         await deployer.deploy(Trust);
         const trust = await Trust.deployed();
     }else{
-        // ADMIN = '';
-        await deployer.deploy(Trust);
+        //         await deployer.deploy(Trust);
     }
 }
