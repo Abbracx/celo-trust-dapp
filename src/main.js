@@ -43,7 +43,8 @@ const connectCeloWallet = async function () {
 const getBalance = async function () {
   const totalBalance = await kit.getTotalBalance(kit.defaultAccount)
   const cUSDBalance = totalBalance.cUSD.shiftedBy(-ERC20_DECIMALS).toFixed(2)
-  document.querySelector("#balance").textContent = cUSDBalance
+  document.querySelector("#balance").textContent = cUSDBalance;
+  document.querySelector("#admin").textContent = kit.defaultAccount;
 }
 
 const getChildren = async function(){
