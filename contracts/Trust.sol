@@ -61,6 +61,7 @@ contract Trust{
         require (Kids[childCount].status == Status.NOT_ADDED, "Kid already exist");
         require ( _kid != msg.sender, "Dude You cant add yourself.");
 
+        IERC20Token(cUsdTokenAddress).approve(address(this), _amount);
         IERC20Token(cUsdTokenAddress).transferFrom(msg.sender, address(this), _amount);
 
         Kids[childCount] = Kid(payable(_kid), _name, _amount, timeToMaturity, _paid, Status.IS_ADDED);
@@ -85,6 +86,22 @@ contract Trust{
             Kids[KidsIndex[_name]].amount,
             Kids[KidsIndex[_name]].timeToMaturity,
             Kids[KidsIndex[_name]].paid
+            );
+    }
+
+    function getKid(uint _index) view external returns(
+        address child,
+        string memory name,
+        uint amount,
+        uint timeToMaturity,
+        bool paid ){
+
+        return (
+            Kids[_index].child,
+            Kids[_index].name,
+            Kids[_index].amount,
+            Kids[_index].tletimeToMaturity,
+            Kids[_index].paid
             );
     }
 
@@ -114,5 +131,8 @@ contract Trust{
         return address(this).balance;
     }
 
+    function getAdmin() view external returns(address){
+        return admin;
+    }
 
 }

@@ -30,7 +30,7 @@
           }
         </style>
 
-        <title>Street Food Kigali</title>
+        <title>CELO TRUST-FUND</title>
     </head>
 
     <body>
@@ -52,20 +52,20 @@
 
            <div class="mb-4" style="margin-top: 4em">
                 <a class="btn btn-dark rounded-pill" data-bs-toggle="modal" data-bs-target="#addModal">
-                  Add product
+                  Add Child
                 </a>
           </div>
 
-          <main id="marketplace" class="row"></main>
+          <main id="kidsList" class="row"></main>
         </div>
 
         <!--Modal-->
-        <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="newProductModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="newChildModalLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
                   <!--Modal Header-->
               <div class="modal-header">
-                <h5 class="modal-title" id="newProductModalLabel">New Product</h5>
+                <h5 class="modal-title" id="newChildModalLabel">New Child</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
                 <!--Modal Body-->
@@ -73,19 +73,17 @@
                 <form>
                   <div class="form-row">
                     <div class="col">
-                      <input type="text" id="newProductName" class="form-control mb-2" placeholder="Enter name of product"/>
+                      <input type="text" id="childAddress" class="form-control mb-2" placeholder="Enter Address of child"/>
                     </div>
                     <div class="col">
-                      <input type="text" id="newImgUrl" class="form-control mb-2" placeholder="Enter image url"/>
+                      <input type="text" id="childName" class="form-control mb-2" placeholder="Enter childs name"/>
+                    </div>
+
+                    <div class="col">
+                        <input type="text" id="amount" class="form-control mb-2" placeholder="Enter amount to deposit"/>
                     </div>
                     <div class="col">
-                      <input type="text" id="newProductDescription" class="form-control mb-2" placeholder="Enter product description"/>
-                    </div>
-                    <div class="col">
-                        <input type="text" id="newLocation" class="form-control mb-2" placeholder="Enter location"/>
-                    </div>
-                    <div class="col">
-                      <input type="text" id="newPrice" class="form-control mb-2" placeholder="Enter price"/>
+                      <input type="text" id="maturityTime" class="form-control mb-2" placeholder="Enter maturity time"/>
                     </div>
                   </div>
                 </form>
@@ -93,7 +91,7 @@
                  <!--Modal Footer-->
                <div class="modal-footer">
                 <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-dark" data-bs-dismiss="modal" id="newProductBtn">Add product</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal" id="newChildBtn">Add Child</button>
               </div>
             </div>
           </div>

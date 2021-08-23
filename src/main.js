@@ -2,21 +2,22 @@ import Web3 from 'web3'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import BigNumber from "bignumber.js"
 
-import marketplaceAbi from '../contract/marketplace.abi.json'
-import erc20Abi from "../contract/erc20.abi.json"
+import trustContract from '../build/contracts/Trust.json'
+import erc20Contract from "../build/contracts/IERC20Token.json"
 const ERC20_DECIMALS = 18
 
 
 let kit
 let contract
-let products = []
-const MPContractAddress = "0x36242b2d86CD4c04e17FbceF8e12e1658acf615F";
+let children = []
+const TrustContractAddress = "0x54D1a66641b902eb52636d8fAf1B1D134c0C56c8";
+
 const cUSDContractAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"
 
 
 const connectCeloWallet = async function () {
   if (window.celo) {
-    notification("⚠️ Please approve this DApp to use it.")
+    notification("⚠️ Please approve this Dapp to use wallet.")
     try {
       await window.celo.enable()
       notificationOff()
@@ -27,7 +28,7 @@ const connectCeloWallet = async function () {
       const accounts = await kit.web3.eth.getAccounts()
       kit.defaultAccount = accounts[0]
 
-      contract = new kit.web3.eth.Contract(marketplaceAbi, MPContractAddress)
+      contract = new kit.web3.eth.Contract(trustContract.abi, TrustContractAddress)
 
     } catch (error) {
       notification(`⚠️ ${error}.`)
@@ -37,129 +38,81 @@ const connectCeloWallet = async function () {
   }
 }
 
-// const products = [
-//   {
-//     name: "Giant BBQ",
-//     image: "https://i.imgur.com/yPreV19.png",
-//     description: `Grilled chicken, beef, fish, sausages, bacon,
-//       vegetables served with chips.`,
-//     location: "Kimironko Market",
-//     owner: "0x32Be343B94f860124dC4fEe278FDCBD38C102D88",
-//     price: 3,
-//     sold: 27,
-//     index: 0,
-//   },
-//   {
-//     name: "BBQ Chicken",
-//     image: "https://i.imgur.com/NMEzoYb.png",
-//     description: `French fries and grilled chicken served with gacumbari
-//       and avocados with cheese.`,
-//     location: "Afrika Fresh KG 541 St",
-//     owner: "0x3275B7F400cCdeBeDaf0D8A9a7C8C1aBE2d747Ea",
-//     price: 4,
-//     sold: 12,
-//     index: 1,
-//   },
-//   {
-//     name: "Beef burrito",
-//     image: "https://i.imgur.com/RNlv3S6.png",
-//     description: `Homemade tortilla with your choice of filling, cheese,
-//       guacamole salsa with Mexican refried beans and rice.`,
-//     location: "Asili - KN 4 St",
-//     owner: "0x2EF48F32eB0AEB90778A2170a0558A941b72BFFb",
-//     price: 2,
-//     sold: 35,
-//     index: 2,
-//   },
-//   {
-//     name: "Barbecue Pizza",
-//     image: "https://i.imgur.com/fpiDeFd.png",
-//     description: `Barbecue Chicken Pizza: Chicken, gouda, pineapple, onions
-//       and house-made BBQ sauce.`,
-//     location: "Kigali Hut KG 7 Ave",
-//     owner: "0x2EF48F32eB0AEB90778A2170a0558A941b72BFFb",
-//     price: 1,
-//     sold: 2,
-//     index: 3,
-//   },
-// ]
 
+// Get MyCelo balance
 const getBalance = async function () {
   const totalBalance = await kit.getTotalBalance(kit.defaultAccount)
   const cUSDBalance = totalBalance.cUSD.shiftedBy(-ERC20_DECIMALS).toFixed(2)
   document.querySelector("#balance").textContent = cUSDBalance
 }
 
-const getProducts = async function(){
-  const _productsLength = await contract.methods.getProductsLength().call()
-  const _products = []
+const getChildren = async function(){
+  const _childrenLength = await contract.methods.getChildCount().call()
+  const _children = []
 
-  for(let j=0; j < _productsLength; j++){
-    let _product = new Promise( async (resolve, reject) => {
-      let p = await contract.methods.readProduct(j).call()
+  for(let j=0; j < _childrenLength; j++){
+    let _child = new Promise( async (resolve, reject) => {
+      let kid = await contract.methods.getKid(j).call()
       resolve({
         index: j,
-        owner: p[0],
-        name: p[1],
-        image: p[2],
-        description: p[3],
-        location: p[4],
-        price: new BigNumber(p[5]),
-        sold: p[6],
+        address: kid[0],
+        name: kid[1],
+        amount: new BigNumber(kid[2]),
+        maturityTime: new Date(kid[3]),
+        paid: kid[4],
       });
     });
-    _products.push(_product)
+    _children.push(_child)
   }
-  products = await Promise.all(_products)
-  renderProducts()
+  children = await Promise.all(_children)
+  renderKids()
 }
 
 
 async function approve(_price) {
-  const cUSDContract = new kit.web3.eth.Contract(erc20Abi, cUSDContractAddress)
+  const cUSDContract = new kit.web3.eth.Contract(erc20Contract.abi, cUSDContractAddress)
 
   const result = await cUSDContract.methods
-    .approve(MPContractAddress, _price)
+    .approve(TrustContractAddress, _price)
     .send({ from: kit.defaultAccount })
   return result
 }
 
 
-function renderProducts() {
-  document.getElementById("marketplace").innerHTML = ""
-  products.forEach((_product) => {
+function renderKids() {
+  document.getElementById("kidsList").innerHTML = ""
+  children.forEach((_child) => {
     const newDiv = document.createElement("div")
     newDiv.className = "col-md-4"
-    newDiv.innerHTML = productTemplate(_product)
-    document.getElementById("marketplace").appendChild(newDiv)
+    newDiv.innerHTML = childTemplate(_child)
+    document.getElementById("kidsList").appendChild(newDiv)
   })
 }
 
-function productTemplate(_product) {
+function childTemplate(_child) {
   return `
     <div class="card mb-4">
-      <img class="card-img-top" src="${_product.image}" alt="...">
+      <img class="card-img-top" src="${_child.image}" alt="...">
       <div class="position-absolute top-0 end-0 bg-warning mt-4 px-2 py-1 rounded-start">
-        ${_product.sold} Sold
+        ${5} Sold
       </div>
 
       <div class="card-body text-left p-4 position-relative">
         <div class="translate-middle-y position-absolute top-0">
-        ${identiconTemplate(_product.owner)}
+        ${identiconTemplate(_child.address)}
         </div>
-        <h2 class="card-title fs-4 fw-bold mt-2">${_product.name}</h2>
-        <p class="card-text mb-4" style="min-height: 82px">
-          ${_product.description}
-        </p>
+        <h2 class="card-title fs-4 fw-bold mt-2">${_child.name}</h2>
+
+
         <p class="card-text mt-4">
           <i class="bi bi-geo-alt-fill"></i>
-          <span>${_product.location}</span>
+          <span>${_child.maturityTime.toUTCString()}</span>
         </p>
         <div class="d-grid gap-2">
           <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
-            _product.index
+            _child.index
           }>
-            Buy for ${_product.price.shiftedBy(-ERC20_DECIMALS).toFixed(2)} cUSD
+            Your Deposited money is ${_child.amount.shiftedBy(-ERC20_DECIMALS).toFixed(2)} cUSD
           </a>
         </div>
       </div>
@@ -199,84 +152,63 @@ window.addEventListener('load', async () => {
   notification("⌛ Loading...")
   await connectCeloWallet()
   await getBalance()
-  await getProducts()
+  await getChildren()
   notificationOff()
 });
 
 
-// window.addEventListener("load", () => {
-//   notification("⌛ Loading...")
-//   getBalance()
-//   renderProducts()
-//   notificationOff()
-// })
-
-// document
-//   .querySelector("#newProductBtn")
-//   .addEventListener("click", () => {
-//     const _product = {
-//       owner: "0x2EF48F32eB0AEB90778A2170a0558A941b72BFFb",
-//       name: document.getElementById("newProductName").value,
-//       image: document.getElementById("newImgUrl").value,
-//       description: document.getElementById("newProductDescription").value,
-//       location: document.getElementById("newLocation").value,
-//       price: document.getElementById("newPrice").value,
-//       sold: 0,
-//       index: products.length,
-//     }
-//     products.push(_product)
-//     notification(`🎉 You successfully added "${_product.name}".`)
-//     renderProducts()
-//   });
-
-document.querySelector("#newProductBtn").addEventListener("click", async (e) => {
+document.querySelector("#newChildBtn").addEventListener("click", async (e) => {
     const params = [
-      document.getElementById("newProductName").value,
-      document.getElementById("newImgUrl").value,
-      document.getElementById("newProductDescription").value,
-      document.getElementById("newLocation").value,
-      new BigNumber(document.getElementById("newPrice").value)
+      document.getElementById("childAddress").value,
+      document.getElementById("childName").value,
+      new BigNumber(document.getElementById("amount").value)
       .shiftedBy(ERC20_DECIMALS)
-      .toString()
+      .toString(),
+      document.getElementById("maturityTime").value,
     ]
-    notification(`⌛ Adding "${params[0]}"...`)
+    notification(`⌛ Adding "${params[1]}"...`)
 
     try {
+      notification("⌛ Waiting for deposit approval...");
+
+      await approve(document.getElementById("amount").value);
+
       const result = await contract.methods
-        .writeProduct(...params)
+        .addKid(...params)
         .send({ from: kit.defaultAccount })
     } catch (error) {
       notification(`⚠️ ${error}.`)
     }
-    notification(`🎉 You successfully added "${params[0]}".`)
-    getProducts()
+    notification(`🎉 You successfully added "${params[1]}" and deposited "${params[2]}".`);
+    getChildren();
   });
 
-  document.querySelector("#marketplace").addEventListener("click", async (e) => {
-    if(e.target.className.includes("buyBtn")) {
-      const index = e.target.id
-      notification("⌛ Waiting for payment approval...")
 
-      // make approval for payment
-      try {
-        await approve(products[index].price)
-      } catch (error) {
-        notification(`⚠️ ${error}.`)
-      }
+//   document.querySelector("#marketplace").addEventListener("click", async (e) => {
+//     if(e.target.className.includes("buyBtn")) {
+//       const index = e.target.id
+//       notification("⌛ Waiting for deposit approval...")
 
-      notification(`⌛ Awaiting payment for "${products[index].name}"...`)
+//       // make approval for payment
+//       try {
+//         await approve(children[index].amount)
+//       } catch (error) {
+//         notification(`⚠️ ${error}.`)
+//       }
 
-      //make the payment after the approval above.
-      try {
-        const result = await contract.methods
-          .buyProduct(index)
-          .send({ from: kit.defaultAccount })
-        notification(`🎉 You successfully bought "${products[index].name}".`)
-        getProducts()
-        getBalance()
-      } catch (error) {
-        notification(`⚠️ ${error}.`)
-      }
-    }
-});
+//       notification(`⌛ Awaiting deposit for "${children[index].name}"...`)
+
+//       //make the payment after the approval above.
+//       try {
+//         const result = await contract.methods
+//           .buyProduct(index)
+//           .send({ from: kit.defaultAccount })
+//         notification(`🎉 You successfully bought "${products[index].name}".`)
+//         getProducts()
+//         getBalance()
+//       } catch (error) {
+//         notification(`⚠️ ${error}.`)
+//       }
+//     }
+// });
 
