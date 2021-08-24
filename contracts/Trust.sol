@@ -52,7 +52,7 @@ contract Trust{
     function addKid (address payable _kid,
                     string memory _name,
                     uint _amount,
-                    uint _timeToMaturity) external payable {
+                    uint _timeToMaturity) public payable {
 
         uint timeToMaturity = block.timestamp + _timeToMaturity;
         bool _paid = false;
@@ -61,7 +61,7 @@ contract Trust{
         require (Kids[childCount].status == Status.NOT_ADDED, "Kid already exist");
         require ( _kid != msg.sender, "Dude You cant add yourself.");
 
-        IERC20Token(cUsdTokenAddress).approve(address(this), _amount);
+
         IERC20Token(cUsdTokenAddress).transferFrom(msg.sender, address(this), _amount);
 
         Kids[childCount] = Kid(payable(_kid), _name, _amount, timeToMaturity, _paid, Status.IS_ADDED);
@@ -72,7 +72,7 @@ contract Trust{
         childCount++;
     }
 
-    function getKid(string memory _name) view external returns(
+    function getKid(string memory _name) view public returns(
         address child,
         string memory name,
         uint amount,
@@ -89,7 +89,7 @@ contract Trust{
             );
     }
 
-    function getKid(uint _index) view external returns(
+    function getKid(uint _index) view public returns(
         address child,
         string memory name,
         uint amount,
@@ -100,12 +100,12 @@ contract Trust{
             Kids[_index].child,
             Kids[_index].name,
             Kids[_index].amount,
-            Kids[_index].tletimeToMaturity,
+            Kids[_index].timeToMaturity,
             Kids[_index].paid
             );
     }
 
-    function withdrawAmount(string memory _name) external {
+    function withdrawAmount(string memory _name) public {
 
         address _child = msg.sender;
 
@@ -119,19 +119,19 @@ contract Trust{
         Kids[KidsIndex[_name]].paid = true;
     }
 
-    function getChildCount() view external returns(uint){
+    function getChildCount() view public returns(uint){
         return childCount;
     }
 
-    function showKidAmount(string memory _name) view external returns(uint){
+    function showKidAmount(string memory _name) view public returns(uint){
         return Kids[KidsIndex[_name]].amount;
     }
 
-    function showContractAmount() view external returns(uint){
+    function showContractAmount() view public returns(uint){
         return address(this).balance;
     }
 
-    function getAdmin() view external returns(address){
+    function getAdmin() view public returns(address){
         return admin;
     }
 
