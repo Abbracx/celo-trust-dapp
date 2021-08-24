@@ -62,7 +62,7 @@ contract Trust{
         require ( _kid != msg.sender, "Dude You cant add yourself.");
 
 
-        IERC20Token(cUsdTokenAddress).transferFrom(msg.sender, address(this), _amount);
+        IERC20Token(cUsdTokenAddress).transferFrom(msg.sender, payable(address(this)), _amount);
 
         Kids[childCount] = Kid(payable(_kid), _name, _amount, timeToMaturity, _paid, Status.IS_ADDED);
         KidsIndex[_name] = childCount;
@@ -107,7 +107,7 @@ contract Trust{
 
     function withdrawAmount(string memory _name) public {
 
-        address _child = msg.sender;
+        address _child = payable(msg.sender);
 
         //only the kid can withdraw his money deposited
         require (Kids[KidsIndex[_name]].child == _child, "Only valid kid can withdraw");
@@ -115,7 +115,7 @@ contract Trust{
         require (Kids[KidsIndex[_name]].paid == false, "Paid Already.");
         require (Kids[KidsIndex[_name]].timeToMaturity < block.timestamp, "Sorry You cannot withdraw now.");
 
-        IERC20Token(cUsdTokenAddress).transfer(payable(_child), Kids[KidsIndex[_name]].amount);
+        IERC20Token(cUsdTokenAddress).transfer(_child, Kids[KidsIndex[_name]].amount);
         Kids[KidsIndex[_name]].paid = true;
     }
 
