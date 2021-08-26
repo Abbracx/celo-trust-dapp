@@ -10,7 +10,7 @@ const ERC20_DECIMALS = 18
 let kit
 let contract
 let children = []
-const TrustContractAddress = "0xA41ECeE4519d64A82Ad33E46021790CEC7870CDb";
+const TrustContractAddress = "0x0DE15f9Bd7dB3aAf177913E74F1Ba6d05A665e67";
 
 const cUSDContractAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"
 
