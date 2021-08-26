@@ -2,8 +2,8 @@ import Web3 from 'web3'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import BigNumber from "bignumber.js"
 
-import trustAbi from '../contract/erc20.abi.json'
-import erc20Abi from '../contract/trust.abi.json'
+import erc20Abi from '../contract/erc20.abi.json'
+import trustAbi from '../contract/trust.abi.json'
 const ERC20_DECIMALS = 18
 
 
@@ -177,6 +177,7 @@ document.querySelector("#newChildBtn").addEventListener("click", async (e) => {
       const result = await contract.methods
         .addKid(...params)
         .send({ from: kit.defaultAccount })
+        notification(`🎉 You successfully added "${params[1]}" and deposited "${params[2]}".`);
     } catch (error) {
       notification(`⚠️ ${error}.`)
     }
