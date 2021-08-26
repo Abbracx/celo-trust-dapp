@@ -2,15 +2,15 @@ import Web3 from 'web3'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import BigNumber from "bignumber.js"
 
-import trustContract from '../build/contracts/Trust.json'
-import erc20Contract from "../build/contracts/IERC20Token.json"
+import trustAbi from '../contract/erc20.abi.json'
+import erc20Abi from '../contract/trust.abi.json'
 const ERC20_DECIMALS = 18
 
 
 let kit
 let contract
 let children = []
-const TrustContractAddress = "0xE2E280ab9F01848cd4478cE5e910bb22A13DA055";
+const TrustContractAddress = "0xA41ECeE4519d64A82Ad33E46021790CEC7870CDb";
 
 const cUSDContractAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"
 
@@ -28,7 +28,7 @@ const connectCeloWallet = async function () {
       const accounts = await kit.web3.eth.getAccounts()
       kit.defaultAccount = accounts[0]
 
-      contract = new kit.web3.eth.Contract(trustContract.abi, TrustContractAddress)
+      contract = new kit.web3.eth.Contract(trustAbi, TrustContractAddress)
 
     } catch (error) {
       notification(`⚠️ ${error}.`)
@@ -71,7 +71,7 @@ const getChildren = async function(){
 
 
 async function approve(_price) {
-  const cUSDContract = new kit.web3.eth.Contract(erc20Contract.abi, cUSDContractAddress)
+  const cUSDContract = new kit.web3.eth.Contract(erc20Abi, cUSDContractAddress)
 
   const result = await cUSDContract.methods
     .approve(TrustContractAddress, _price)
